@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GeoJournal</string>
+    <string name="action_settings">Configuración</string>
+    <string name="nextDialog">Siguiente</string>
+    <string name="TextYes">Sí</string>
+    <string name="TextNo">No</string>
+    <string name="TextTitleDialogQuestion">continuar</string>
+    <string name="SignUpTxt">Registrarse</string>
+    <string name="nameTxt">Nombre</string>
+    <string name="fnameTxt">Primer Apellido</string>
+    <string name="snametxt">Segundo Apellido</string>
+    <string name="emailTxt">Correo Elec.</string>
+    <string name="phonetxt">Numero de teléfono</string>
+    <string name="bdayTxt">Fecha de Nacimiento</string>
+</resources>

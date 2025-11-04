@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">GeoJournal</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="nextDialog">Next</string>
+    <string name="TextYes">Yes</string>
+    <string name="TextNo">No</string>
+    <string name="TextTitleDialogQuestion">Continue</string>
+    <string name="SignUpTxt">Sign Up</string>
+    <string name="nameTxt">Name</string>
+    <string name="fnameTxt">First Lastname</string>
+    <string name="snametxt">Second Lastname</string>
+    <string name="emailTxt">E-mail</string>
+    <string name="phonetxt">Phone number</string>
+    <string name="bdayTxt">Birthdate</string>
+
+</resources>
