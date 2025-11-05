@@ -12,5 +12,10 @@
     <string name="snametxt">Segundo Apellido</string>
     <string name="emailTxt">Correo Elec.</string>
     <string name="phonetxt">Numero de teléfono</string>
-    <string name="bdayTxt">Fecha de Nacimiento</string>
+    <string name="bdayTxt">Elegir Fecha de Nacimiento</string>
+    <string name="ErrorMsgAdd">Error al añadir data</string>
+    <string name="ErrorMsgUpdate">Error al actualizar data</string>
+    <string name="MsgDataNotFound">Info no encontrada</string>
+    <string name="ErrorMsgRemove">Error eliminando info</string>
+    <string name="ErrorMsgGetById">Info no encontrada por id</string>
 </resources>

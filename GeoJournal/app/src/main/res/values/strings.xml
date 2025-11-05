@@ -12,6 +12,11 @@
     <string name="snametxt">Second Lastname</string>
     <string name="emailTxt">E-mail</string>
     <string name="phonetxt">Phone number</string>
-    <string name="bdayTxt">Birthdate</string>
+    <string name="bdayTxt">Select Birthdate</string>
+    <string name="ErrorMsgAdd">Error adding data</string>
+    <string name="ErrorMsgUpdate">Error updating data</string>
+    <string name="MsgDataNotFound">Data not found</string>
+    <string name="ErrorMsgRemove">Error deleting data</string>
+    <string name="ErrorMsgGetById">Data not found</string>
 
 </resources>
