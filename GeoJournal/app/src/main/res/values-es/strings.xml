@@ -18,4 +18,9 @@
     <string name="MsgDataNotFound">Info no encontrada</string>
     <string name="ErrorMsgRemove">Error eliminando info</string>
     <string name="ErrorMsgGetById">Info no encontrada por id</string>
+    <string name="TextSaveActionQuestion">¿Desea guardar la info?</string>
+    <string name="TextDeleteActionQuestion">¿Desea eliminar la info?</string>
+    <string name="MsgDuplicateDate">Fecha duplicada</string>
+    <string name="MsgSaveSuccess">La info ha sido guardada</string>
+    <string name="MsgDeleteSuccess">La info ha sido eliminada</string>
 </resources>
