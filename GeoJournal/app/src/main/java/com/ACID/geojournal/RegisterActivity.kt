@@ -197,6 +197,7 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                     person.SLastName = txtSLastName.text.toString()
                     person.Email = txtEmail.text.toString()
                     person.Phone = txtPhone.text.toString().toInt()
+                    person.Photo = null
                     val bDateParse = Util.Util.parseStringToDateModern(lbBirthdate.text.toString(),
                         "dd/MM/yyyy")
                     person.Birthday = LocalDate.of(bDateParse?.year!!, bDateParse.month.value
