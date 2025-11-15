@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GeoJournal</string>
+    <string name="action_settings">Configuración</string>
+    <string name="nextDialog">Siguiente</string>
+    <string name="TextYes">Sí</string>
+    <string name="TextNo">No</string>
+    <string name="TextTitleDialogQuestion">continuar</string>
+    <string name="SignUpTxt">Registrarse</string>
+    <string name="nameTxt">Nombre</string>
+    <string name="fnameTxt">Primer Apellido</string>
+    <string name="snametxt">Segundo Apellido</string>
+    <string name="emailTxt">Correo Elec.</string>
+    <string name="phonetxt">Numero de teléfono</string>
+    <string name="bdayTxt">Elegir Fecha de Nacimiento</string>
+    <string name="ErrorMsgAdd">Error al añadir data</string>
+    <string name="ErrorMsgUpdate">Error al actualizar data</string>
+    <string name="MsgDataNotFound">Info no encontrada</string>
+    <string name="ErrorMsgRemove">Error eliminando info</string>
+    <string name="ErrorMsgGetById">Info no encontrada por id</string>
+    <string name="TextSaveActionQuestion">¿Desea guardar la info?</string>
+    <string name="TextDeleteActionQuestion">¿Desea eliminar la info?</string>
+    <string name="MsgDuplicateDate">Fecha duplicada</string>
+    <string name="MsgSaveSuccess">La info ha sido guardada</string>
+    <string name="MsgDeleteSuccess">La info ha sido eliminada</string>
+</resources>
