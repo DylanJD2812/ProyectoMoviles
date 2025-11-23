@@ -8,8 +8,7 @@
     <string name="TextTitleDialogQuestion">Continue</string>
     <string name="SignUpTxt">Sign Up</string>
     <string name="nameTxt">Name</string>
-    <string name="fnameTxt">First Lastname</string>
-    <string name="snametxt">Second Lastname</string>
+    <string name="fnameTxt">Lastname</string>
     <string name="emailTxt">E-mail</string>
     <string name="phonetxt">Phone number</string>
     <string name="bdayTxt">Select Birthdate</string>
@@ -18,10 +17,15 @@
     <string name="MsgDataNotFound">Data not found</string>
     <string name="ErrorMsgRemove">Error deleting data</string>
     <string name="ErrorMsgGetById">Data not found</string>
+    <string name="ErrorMsgGetAll">Error getting all data</string>
     <string name="TextSaveActionQuestion">Do you want to save data?</string>
     <string name="TextDeleteActionQuestion">Do you want to delete data?</string>
     <string name="MsgDuplicateDate">Duplicate Date</string>
     <string name="MsgSaveSuccess">The info has been saved</string>
     <string name="MsgDeleteSuccess">The data has been deleted</string>
+    <string name="IdTxt_hint">Enter ID</string>
+    <string name="nameTxt_hint">Enter your name</string>
+    <string name="lnameTxt_hint">Enter your lastname</string>
+    <string name="passTxt_hint">Enter your password</string>
 
 </resources>

@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GeoJournal">
         <activity
+            android:name=".HistoryListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".MapActivity"
             android:exported="false" />
         <activity
