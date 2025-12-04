@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758610291012",
+    "project_id": "geojournal-f445d",
+    "storage_bucket": "geojournal-f445d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758610291012:android:2649dc9fe8f6c95f0fcf11",
+        "android_client_info": {
+          "package_name": "com.ACID.geojournal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbR6bUWebPNYTyJq-mMhe8-eJaHtvLeRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

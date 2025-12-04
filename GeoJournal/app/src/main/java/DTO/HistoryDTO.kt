@@ -1,8 +1,12 @@
 package DTO
 
+import java.time.LocalDateTime
+
 data class HistoryDTO(
-    val id: Int = 0,
+    val id: String = "",
     val title: String = "",
     val comment: String = "",
-    val photoUrl: String? = null
+    val photoUrl: String? = null,
+    val personId: String = "",
+    val createdAt: String = ""
 )

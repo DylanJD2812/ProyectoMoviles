@@ -1,16 +1,18 @@
+
 package com.ACID.geojournal
 
-import com.ACID.geojournal.R
 import Controller.PersonController
 import Entity.Person
+import Util.Util
 import android.app.DatePickerDialog
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Button
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -28,13 +30,20 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     private lateinit var txtPassword: EditText
     private lateinit var lbBirthdate: TextView
     private lateinit var btnSignUp: Button
-    private lateinit var btnCancel: Button
+    private lateinit var btnCancel: ImageButton
+    private lateinit var btnSelectDate: ImageButton
+    private lateinit var btnSelectPhoto: ImageButton // Single button for photo selection
 
     private var day: Int = 0
     private var month: Int = 0
     private var year: Int = 0
 
     private lateinit var personController: PersonController
+
+    private lateinit var cameraLauncher: Any
+    private lateinit var galleryLauncher: Any
+    private lateinit var userPhoto: ImageView
+    private var selectedBitmap: Bitmap? = null // Store the selected bitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,8 +55,8 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             insets
         }
         personController = PersonController(this)
-
         initializeViews()
+        setupPhotoLaunchers()
         setupClickListeners()
         ResetDate()
     }
@@ -59,16 +68,16 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         txtEmail = findViewById<EditText>(R.id.emailText)
         txtPassword = findViewById<EditText>(R.id.passText)
         lbBirthdate = findViewById<TextView>(R.id.lbBirthdate_Person)
+        userPhoto = findViewById<ImageView>(R.id.photoPreview)
         btnSignUp = findViewById<Button>(R.id.btnSignUp)
-        btnCancel = findViewById<Button>(R.id.btnCancel)
+        btnCancel = findViewById<ImageButton>(R.id.btnCancel)
+        btnSelectDate = findViewById<ImageButton>(R.id.btnSelectDate_person)
+        btnSelectPhoto =
+            findViewById<ImageButton>(R.id.ivCamera) // Rename this button in your layout to be more generic
     }
 
-    private fun setupClickListeners() {
-        val btnSelectDate = findViewById<ImageButton>(R.id.btnSelectDate_person)
-        btnSelectDate.setOnClickListener {
-            showDatePickerDialog()
-        }
 
+    private fun setupClickListeners() {
         btnSignUp.setOnClickListener {
             registerPerson()
         }
@@ -76,6 +85,57 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         btnCancel.setOnClickListener {
             cleanScreen()
         }
+
+        btnSelectPhoto.setOnClickListener {
+            showPhotoSelectionDialog()
+        }
+
+        btnSelectDate.setOnClickListener {
+            showDatePickerDialog()
+        }
+    }
+
+    private fun setupPhotoLaunchers() {
+        // Initialize camera launcher
+        cameraLauncher = Util.createCameraLauncher(
+            activity = this,
+            onPhotoCaptured = { bitmap ->
+                selectedBitmap = bitmap
+                userPhoto.setImageBitmap(bitmap)
+                Util.showShortToast(this, "Photo captured successfully")
+            },
+            onCancel = {
+                Util.showShortToast(this, "Photo capture cancelled")
+            }
+        )
+
+        // Initialize gallery launcher
+        galleryLauncher = Util.createGalleryLauncher(
+            activity = this,
+            onPhotoSelected = { bitmap ->
+                selectedBitmap = bitmap
+                userPhoto.setImageBitmap(bitmap)
+                Util.showShortToast(this, "Photo selected successfully")
+            },
+            onError = { errorMessage ->
+                Util.showShortToast(this, errorMessage)
+            },
+            onCancel = {
+                Util.showShortToast(this, "Photo selection cancelled")
+            }
+        )
+    }
+
+    private fun showPhotoSelectionDialog() {
+        Util.showPhotoSelectionDialog(
+            context = this,
+            onTakePhoto = {
+                Util.takePhoto(cameraLauncher)
+            },
+            onSelectFromGallery = {
+                Util.selectPhoto(galleryLauncher)
+            }
+        )
     }
 
     private fun ResetDate() {
@@ -103,41 +163,42 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
     private fun isValidationData(): Boolean {
         if (lbBirthdate.text.isNullOrEmpty()) {
-            showToast("Please select birth date")
+            Util.showShortToast(this, "Please select birth date")
             return false
         }
 
-        val dateParse = Util.Util.parseStringToDateModern(lbBirthdate.text.toString(), "dd/MM/yyyy")
+        val dateParse = Util.parseStringToDateModern(lbBirthdate.text.toString(), "dd/MM/yyyy")
 
-        // Validate all required fields
         if (txtName.text.trim().isEmpty()) {
-            showToast("Please enter name")
+            Util.showShortToast(this, "Please enter name")
             return false
         }
 
         if (txtLastName.text.trim().isEmpty()) {
-            showToast("Please enter last name")
+            Util.showShortToast(this, "Please enter last name")
             return false
         }
 
         if (txtEmail.text.trim().isEmpty()) {
-            showToast("Please enter email")
+            Util.showShortToast(this, "Please enter email")
             return false
         }
 
         if (txtPassword.text.trim().isEmpty() || txtPassword.text.length < 6) {
-            showToast("Password must be at least 6 characters")
+            Util.showShortToast(this, "Password must be at least 6 characters")
             return false
         }
 
         val phoneText = txtPhone.text.trim()
-        if (phoneText.isEmpty() || phoneText.length < 8 || phoneText.toString().toIntOrNull() == null) {
-            showToast("Please enter a valid phone number (at least 8 digits)")
+        if (phoneText.isEmpty() || phoneText.length < 8 || phoneText.toString()
+                .toIntOrNull() == null
+        ) {
+            Util.showShortToast(this, "Please enter a valid phone number (at least 8 digits)")
             return false
         }
 
         if (dateParse == null) {
-            showToast("Invalid date format")
+            Util.showShortToast(this, "Invalid date format")
             return false
         }
 
@@ -152,6 +213,8 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         txtPhone.setText("")
         txtPassword.setText("")
         lbBirthdate.text = ""
+        userPhoto.setImageResource(android.R.color.transparent) // Clear photo
+        selectedBitmap = null // Clear stored bitmap
     }
 
     private fun registerPerson() {
@@ -161,37 +224,60 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                     return@launch
                 }
 
-                val bDateParse = Util.Util.parseStringToDateModern(lbBirthdate.text.toString(), "dd/MM/yyyy")
-                    ?: run {
-                        showToast("Invalid date format")
-                        return@launch
-                    }
+                val bDateParse =
+                    Util.parseStringToDateModern(lbBirthdate.text.toString(), "dd/MM/yyyy")
+                        ?: run {
+                            Util.showShortToast(this@RegisterActivity, "Invalid date format")
+                            return@launch
+                        }
+
+                // Store credentials for login attempt
+                val email = txtEmail.text.toString().trim()
+                val password = txtPassword.text.toString().trim()
 
                 val person = Person().apply {
-                    // ID will be generated by Firebase
                     Name = txtName.text.toString().trim()
                     LastName = txtLastName.text.toString().trim()
                     Phone = txtPhone.text.toString().toIntOrNull() ?: 0
-                    Email = txtEmail.text.toString().trim()
-                    Password = txtPassword.text.toString().trim()
-                    Birthday = LocalDate.of(bDateParse.year, bDateParse.monthValue, bDateParse.dayOfMonth)
-                    Photo = null
+                    Email = email
+                    Password = password
+                    Birthday =
+                        LocalDate.of(bDateParse.year, bDateParse.monthValue, bDateParse.dayOfMonth)
+                    Photo = selectedBitmap
                 }
 
+                // Register the person
                 val newId = personController.addPerson(person)
-                showToast(getString(R.string.MsgSaveSuccess))
-                cleanScreen()
+                Util.showShortToast(this@RegisterActivity, getString(R.string.MsgSaveSuccess))
 
-                // Optionally navigate to another activity after successful registration
-                // finish()
+                // Attempt to login with the same credentials
+                val loginSuccess = personController.login(email, password)
+
+                if (loginSuccess) {
+                    Util.showShortToast(
+                        this@RegisterActivity,
+                        "Registration successful! Auto-login completed."
+                    )
+                    // Navigate to main activity or home screen
+                    Util.openActivityAndFinish(
+                        this@RegisterActivity,
+                        HomeScreenActivity::class.java
+                    )
+                } else {
+                    Util.showShortToast(
+                        this@RegisterActivity,
+                        "Registration successful! Please login manually."
+                    )
+                    cleanScreen()
+                    // Optionally navigate to login screen
+                    Util.openActivity(this@RegisterActivity, LoginActivity::class.java)
+                }
 
             } catch (e: Exception) {
-                showToast(e.message ?: "Registration failed")
+                Util.showShortToast(this@RegisterActivity, e.message ?: "Registration failed")
             }
         }
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+
 }

@@ -5,9 +5,12 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity">
+    tools:context=".RegisterActivity"
+    android:background="#FAFAFA"> <!-- Softer background for contrast -->
 
+    <!-- CANCEL + HEADER CONTAINER -->
     <LinearLayout
+        android:id="@+id/headerContainer"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,64 +18,73 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Header Row -->
+        <!-- HEADER -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="24dp"
             android:paddingBottom="24dp">
 
+            <!-- Title -->
             <TextView
                 android:id="@+id/tvSignUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/SignUpTxt"
-                android:textColor="#1F1F1F"
+                android:textColor="#1A1A1A"
                 android:textSize="32sp"
-                android:textStyle="bold" />
-            <!-- PHOTO PREVIEW -->
+                android:textStyle="bold"
+                android:layout_centerHorizontal="true" />
 
-            <!-- Circular icon container -->
+            <!-- Photo Preview -->
             <FrameLayout
                 android:id="@+id/photoPreviewContainer"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginStart="49dp"
-                android:layout_marginEnd="59dp"
-                android:layout_marginBottom="20dp"
-                android:layout_toStartOf="@+id/frameLayout"
-                android:layout_toEndOf="@+id/tvSignUp"
-                android:background="@drawable/rounded_form_card"
-                android:elevation="4dp"
-                android:padding="12dp">
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_below="@id/tvSignUp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/circle_white_shadow"
+                android:padding="4dp">
 
                 <ImageView
                     android:id="@+id/photoPreview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:adjustViewBounds="true"
-                    android:contentDescription="Selected photo preview"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/ic_launcher_foreground" />
+                    android:contentDescription="Selected photo preview"
+                    android:background="@drawable/rounded_form_card" />
             </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/frameLayout"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
+            <!-- Camera button floating -->
+            <ImageButton
+                android:id="@+id/ivCamera"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_white_shadow"
+                android:padding="10dp"
+                android:src="@android:drawable/ic_menu_camera"
+                android:scaleType="centerInside"
+                android:contentDescription="camera icon"
+                android:layout_alignEnd="@id/photoPreviewContainer"
+                android:layout_alignBottom="@id/photoPreviewContainer"
+                android:layout_marginEnd="-8dp"
+                android:layout_marginBottom="-8dp"
+                app:tint="#2A2A2A" />
+
+            <ImageButton
+                android:id="@+id/btnCancel"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_alignParentEnd="true"
-                android:background="@drawable/ic_launcher_foreground"
-                android:padding="12dp">
-
-                <ImageView
-                    android:id="@+id/ivCamera"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="camera icon"
-                    android:src="@android:drawable/ic_menu_camera" />
-            </FrameLayout>
+                android:background="@android:color/transparent"
+                android:contentDescription="Cancel"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="#2A2A2A" />
         </RelativeLayout>
 
-        <!-- Card-style Form Container -->
+        <!-- FORM CONTAINER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,38 +93,18 @@
             android:padding="24dp"
             android:elevation="4dp">
 
-            <!-- ID (no label) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp">
-                <EditText
-                    android:id="@+id/idText"
-                    android:layout_width="260dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/rounded_input"
-                    android:hint="@string/IdTxt_hint"
-                    android:paddingLeft="14dp" />
-
-                <ImageButton
-                    android:id="@+id/btnCancel"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="Cancel"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel" />
-
-            </LinearLayout>
-
+            <!-- PASSWORD -->
             <EditText
                 android:id="@+id/passText"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/rounded_input"
                 android:hint="@string/passTxt_hint"
-                android:paddingLeft="14dp" />
-            <!-- NAME + LASTNAME ROW -->
+                android:textColor="#1A1A1A"
+                android:textColorHint="#888888"
+                android:paddingLeft="18dp" />
+
+            <!-- NAME + LASTNAME -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,7 +118,9 @@
                     android:layout_weight="1"
                     android:background="@drawable/rounded_input"
                     android:hint="@string/nameTxt_hint"
-                    android:paddingLeft="14dp" />
+                    android:textColor="#1A1A1A"
+                    android:textColorHint="#888888"
+                    android:paddingLeft="18dp" />
 
                 <Space
                     android:layout_width="8dp"
@@ -139,10 +133,12 @@
                     android:layout_weight="1.3"
                     android:background="@drawable/rounded_input"
                     android:hint="@string/lnameTxt_hint"
-                    android:paddingLeft="14dp" />
+                    android:textColor="#1A1A1A"
+                    android:textColorHint="#888888"
+                    android:paddingLeft="18dp" />
             </LinearLayout>
 
-            <!-- EMAIL (no label) -->
+            <!-- EMAIL -->
             <EditText
                 android:id="@+id/emailText"
                 android:layout_width="match_parent"
@@ -150,10 +146,12 @@
                 android:background="@drawable/rounded_input"
                 android:hint="example@email.com"
                 android:inputType="textEmailAddress"
-                android:paddingLeft="14dp"
-                android:layout_marginTop="16dp"/>
+                android:textColor="#1A1A1A"
+                android:textColorHint="#888888"
+                android:paddingLeft="18dp"
+                android:layout_marginTop="16dp" />
 
-            <!-- PHONE (no label) -->
+            <!-- PHONE -->
             <EditText
                 android:id="@+id/phoneText"
                 android:layout_width="match_parent"
@@ -161,17 +159,19 @@
                 android:background="@drawable/rounded_input"
                 android:hint="0000-0000"
                 android:inputType="phone"
-                android:paddingLeft="14dp"
+                android:textColorHint="#888888"
+                android:textColor="#1A1A1A"
+                android:paddingLeft="18dp"
                 android:layout_marginTop="16dp" />
 
-            <!-- BIRTHDATE (custom row, no label) -->
+            <!-- BIRTHDATE -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/rounded_input"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingStart="14dp"
+                android:paddingStart="18dp"
                 android:paddingEnd="8dp"
                 android:layout_marginTop="16dp">
 
@@ -181,7 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="MM / DD / YYYY"
-                    android:textColor="#888"
+                    android:textColor="#444444"
                     android:textSize="15sp" />
 
                 <ImageButton
@@ -190,7 +190,8 @@
                     android:layout_height="32dp"
                     android:background="@android:color/transparent"
                     android:contentDescription="Select birthdate"
-                    android:src="@android:drawable/ic_menu_my_calendar" />
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    app:tint="#2A2A2A" />
             </LinearLayout>
 
             <!-- SIGN UP BUTTON -->
@@ -201,8 +202,9 @@
                 android:layout_marginTop="28dp"
                 android:background="@drawable/btn_green"
                 android:text="SIGN UP"
-                android:textColor="#fff"
+                android:textColor="#FFFFFF"
                 android:textAllCaps="false" />
         </LinearLayout>
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,37 +1,20 @@
 package com.ACID.geojournal
 
 import android.os.Bundle
-import android.transition.TransitionManager
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.Button
-import android.widget.LinearLayout
-import com.ACID.geojournal.R.*
 
-class MainActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(layout.activity_main)
+        setContentView(R.layout.activity_login)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        //action1 = findViewById(R.id.action1)
-        //action2 = findViewById(R.id.action2)
-        //action3 = findViewById(R.id.action3)
-
-        val btnopenactivity = findViewById<Button>(R.id.OpenActivitybtn)
-        btnopenactivity.setOnClickListener(View.OnClickListener{ view ->
-            Util.Util.openActivity(this, RegisterActivity::class.java)
-        })
-
     }
 }
-

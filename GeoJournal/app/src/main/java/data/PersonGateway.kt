@@ -2,15 +2,22 @@ package data
 
 import Entity.Person
 import Interface.PDataManager
+import android.graphics.Bitmap
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
+import java.io.ByteArrayOutputStream
 
 object PersonGateway : PDataManager {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+    private val storage = FirebaseStorage.getInstance()
     private val personCollection = db.collection("persons")
+    private val storageRef = storage.reference
 
     override suspend fun add(person: Person): String {
         try {
@@ -18,13 +25,19 @@ object PersonGateway : PDataManager {
             val authResult = auth.createUserWithEmailAndPassword(person.Email, person.Password).await()
             val userId = authResult.user?.uid ?: throw Exception("Failed to create user in authentication")
 
-            // 2. Create user profile with display name
+            // 2. Upload photo to Firebase Storage if exists
+            var photoUrl: String? = null
+            person.Photo?.let { bitmap ->
+                photoUrl = uploadImageToStorage(bitmap, userId)
+            }
+
+            // 3. Create user profile with display name
             val profileUpdates = UserProfileChangeRequest.Builder()
                 .setDisplayName("${person.Name} ${person.LastName}")
                 .build()
             authResult.user?.updateProfile(profileUpdates)?.await()
 
-            // 3. Store additional user data in Firestore
+            // 4. Store additional user data in Firestore
             person.ID = userId
             val personData = mapOf(
                 "ID" to person.ID,
@@ -33,7 +46,7 @@ object PersonGateway : PDataManager {
                 "Phone" to person.Phone,
                 "Email" to person.Email,
                 "Birthday" to person.Birthday.toString(),
-                // Don't store password in Firestore for security
+                "PhotoUrl" to photoUrl
             )
 
             personCollection.document(userId).set(personData).await()
@@ -54,11 +67,12 @@ object PersonGateway : PDataManager {
                     LastName = document.getString("LastName") ?: ""
                     Phone = document.getLong("Phone")?.toInt() ?: 0
                     Email = document.getString("Email") ?: ""
-                    // Password is not stored in Firestore for security
                     val birthdayStr = document.getString("Birthday") ?: ""
                     if (birthdayStr.isNotEmpty()) {
                         Birthday = java.time.LocalDate.parse(birthdayStr)
                     }
+                    // Note: Photo is not loaded here for performance
+                    // You can load it separately if needed
                 }
             } else {
                 null
@@ -104,6 +118,12 @@ object PersonGateway : PDataManager {
                 }
             }
 
+            // Upload new photo if exists
+            var photoUrl: String? = null
+            person.Photo?.let { bitmap ->
+                photoUrl = uploadImageToStorage(bitmap, person.ID)
+            }
+
             // Update user data in Firestore
             val personData = mapOf(
                 "ID" to person.ID,
@@ -111,7 +131,8 @@ object PersonGateway : PDataManager {
                 "LastName" to person.LastName,
                 "Phone" to person.Phone,
                 "Email" to person.Email,
-                "Birthday" to person.Birthday.toString()
+                "Birthday" to person.Birthday.toString(),
+                "PhotoUrl" to photoUrl
             )
 
             personCollection.document(person.ID).set(personData).await()
@@ -129,6 +150,9 @@ object PersonGateway : PDataManager {
                 user.delete().await()
             }
 
+            // Delete photo from Storage
+            deleteImageFromStorage(id)
+
             // Delete from Firestore
             personCollection.document(id).delete().await()
             true
@@ -137,8 +161,37 @@ object PersonGateway : PDataManager {
         }
     }
 
+    // Upload image to Firebase Storage
+    private suspend fun uploadImageToStorage(bitmap: Bitmap, userId: String): String {
+        return try {
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos)
+            val data = baos.toByteArray()
+
+            val imageRef = storageRef.child("profile_photos/$userId.jpg")
+            val uploadTask = imageRef.putBytes(data).await()
+
+            // Get download URL
+            val downloadUrl = imageRef.downloadUrl.await()
+            downloadUrl.toString()
+        } catch (e: Exception) {
+            throw Exception("Failed to upload image: ${e.message}")
+        }
+    }
+
+    // Delete image from Firebase Storage
+    private suspend fun deleteImageFromStorage(userId: String) {
+        try {
+            val imageRef = storageRef.child("profile_photos/$userId.jpg")
+            imageRef.delete().await()
+        } catch (e: Exception) {
+            // Log error but don't throw - it's okay if image doesn't exist
+            println("Error deleting image: ${e.message}")
+        }
+    }
+
     // Additional authentication methods
-    suspend fun login(email: String, password: String): Boolean {
+    override suspend fun login(email: String, password: String): Boolean {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
             true
@@ -147,7 +200,7 @@ object PersonGateway : PDataManager {
         }
     }
 
-    suspend fun logout(): Boolean {
+    override suspend fun logout(): Boolean {
         return try {
             auth.signOut()
             true
@@ -156,7 +209,7 @@ object PersonGateway : PDataManager {
         }
     }
 
-    suspend fun getCurrentUser(): Person? {
+    override suspend fun getCurrentUser(): Person? {
         return try {
             val user = auth.currentUser
             user?.let { getById(it.uid) }
@@ -165,7 +218,7 @@ object PersonGateway : PDataManager {
         }
     }
 
-    suspend fun resetPassword(email: String): Boolean {
+    override suspend fun resetPassword(email: String): Boolean {
         return try {
             auth.sendPasswordResetEmail(email).await()
             true
