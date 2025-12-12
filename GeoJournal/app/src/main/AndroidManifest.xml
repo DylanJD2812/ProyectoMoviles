@@ -13,7 +13,11 @@
         android:theme="@style/Theme.GeoJournal">
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
+            android:exported="false">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".HomeScreenActivity"
             android:exported="false" />
