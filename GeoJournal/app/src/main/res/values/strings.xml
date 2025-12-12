@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">GeoJournal</string>
     <string name="action_settings">Settings</string>
+    <string name="api_key" translatable="false">AIzaSyBeQ4XSJtnuTvSujRzvkjfuq5zrMHK1K6A</string>
 
     <string name="nextDialog">Next</string>
     <string name="TextYes">Yes</string>

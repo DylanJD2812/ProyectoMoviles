@@ -14,9 +14,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.coroutines.launch
 
-class HomeScreenActivity : AppCompatActivity() {
+class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var Addbtn: Button
     private lateinit var Historybtn: Button
     private lateinit var Userbtn: Button
@@ -25,6 +28,8 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var menuBtn: Button
     private lateinit var drop: LinearLayout
     private lateinit var personController: PersonController
+    private lateinit var map: GoogleMap
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +41,8 @@ class HomeScreenActivity : AppCompatActivity() {
             insets
         }
         personController = PersonController(this)
-
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
         initializeViews()
         setupClickListeners()
     }
@@ -51,7 +57,24 @@ class HomeScreenActivity : AppCompatActivity() {
     }
     fun setupClickListeners() {
         Addbtn.setOnClickListener {
-            Util.Util.openActivity(this, HistoryActivity::class.java)
+            lifecycleScope.launch {
+                try {
+                    val currentUser = personController.getCurrentUser()
+
+                    if (currentUser?.ID != null) {
+                        Util.Util.openActivity(
+                            this@HomeScreenActivity,
+                            HistoryActivity::class.java,
+                            "PERSON_ID",
+                            currentUser.ID
+                        )
+                    } else {
+                        showToast("Error: User not identified")
+                    }
+                } catch (e: Exception) {
+                    showToast("Error: User not identified")
+                }
+            }
         }
         Historybtn.setOnClickListener {
             Util.Util.openActivity(this, HistoryListActivity::class.java)
@@ -138,5 +161,9 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onMapReady(p0: GoogleMap) {
+        map = p0
     }
 }
