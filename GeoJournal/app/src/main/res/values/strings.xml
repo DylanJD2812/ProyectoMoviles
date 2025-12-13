@@ -47,5 +47,9 @@
     <string name="passTxt_hint">Enter your password</string>
     <string name="permits">Location permits need to be allowed</string>
     <string name="sign_in">Sign in</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">LOGIN</string>
+    <string name="forgot_password">Forgot your password?</string>
 
 </resources>

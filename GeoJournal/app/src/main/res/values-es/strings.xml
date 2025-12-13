@@ -12,7 +12,7 @@
     <string name="fnameTxt">Apellidos</string>
     <string name="emailTxt">Correo Elec.</string>
     <string name="phonetxt">Numero de teléfono</string>
-    <string name="bdayTxt">Elegir Fecha de Nacimiento</string>
+    <string name="bdayTxt">Fecha de Nacimiento</string>
     <string name="ErrorMsgAdd">Error al añadir data</string>
     <string name="ErrorMsgUpdate">Error al actualizar data</string>
     <string name="MsgDataNotFound">Info no encontrada</string>
@@ -36,6 +36,7 @@
     <string name="new_memory">nueva memoria</string>
     <string name="title">Titulo</string>
     <string name="description">Descripción</string>
+    <string name="location_pending">Ubicando...</string>
     <string name="menu">Menú</string>
     <string name="profile">Perfil</string>
     <string name="see_history">Ver tus historias</string>
@@ -43,4 +44,10 @@
     <string name="cd_open_menu">Abrir menú</string>
     <string name="permits">Necesita aceptar los permisos de localzación</string>
     <string name="sign_in">Iniciar Sesión</string>
+    <string name="location_label">Ubicación</string>
+    <string name="location_unknown">Ubicación no disponible</string>
+    <string name="email">Correo Elect.</string>
+    <string name="password">Contraseña</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="forgot_password">Olvidaste tu contraseña?</string>
 </resources>

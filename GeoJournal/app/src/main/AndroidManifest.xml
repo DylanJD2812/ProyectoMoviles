@@ -19,7 +19,8 @@
             android:value="@string/api_key" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false">
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize">
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".MainActivity" />
