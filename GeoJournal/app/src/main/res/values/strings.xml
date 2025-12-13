@@ -12,6 +12,9 @@
     <string name="new_memory">New memory</string>
     <string name="title">Title</string>
     <string name="description">Description</string>
+    <string name="location_label">Location</string>
+    <string name="location_unknown">Location not available</string>
+    <string name="location_pending">Requesting location…</string>
     <string name="menu">Menu</string>
     <string name="profile">Profile</string>
     <string name="see_history">See histories</string>

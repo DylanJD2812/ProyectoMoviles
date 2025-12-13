@@ -30,6 +30,7 @@ object HistoryGateway : HDataManager {
                 "id" to history.Id,
                 "title" to history.Title,
                 "comment" to history.Comment,
+                "location" to history.Location,
                 "personId" to personId,
                 "photoUrl" to photoUrl,
                 "createdAt" to history.CreatedAt.toString()
@@ -52,6 +53,7 @@ object HistoryGateway : HDataManager {
                     Id = document.getString("id") ?: ""
                     Title = document.getString("title") ?: ""
                     Comment = document.getString("comment") ?: ""
+                    Location = document.getString("location") ?: ""
                     PersonId = document.getString("personId") ?: ""
                     // Note: Photo would need to be loaded separately from URL if needed
                     val createdAtStr = document.getString("createdAt") ?: ""
@@ -74,6 +76,7 @@ object HistoryGateway : HDataManager {
                     Id = document.getString("id") ?: ""
                     Title = document.getString("title") ?: ""
                     Comment = document.getString("comment") ?: ""
+                    Location = document.getString("location") ?: ""
                     PersonId = document.getString("personId") ?: ""
                     val createdAtStr = document.getString("createdAt") ?: ""
                     if (createdAtStr.isNotEmpty()) {
@@ -99,6 +102,7 @@ object HistoryGateway : HDataManager {
                 "id" to history.Id,
                 "title" to history.Title,
                 "comment" to history.Comment,
+                "location" to history.Location,
                 "personId" to personId,
                 "photoUrl" to photoUrl,
                 "createdAt" to history.CreatedAt.toString()
