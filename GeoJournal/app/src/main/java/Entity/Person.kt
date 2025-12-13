@@ -12,6 +12,7 @@ class Person {
     var Password: String = "" // Added password field
     lateinit var Birthday: LocalDate
     var Photo: Bitmap? = null
+    var PhotoUrl: String? = null
 
     constructor()
 
@@ -23,7 +24,8 @@ class Person {
         email: String,
         password: String, // Added password parameter
         birthday: LocalDate,
-        photo: Bitmap?
+        photo: Bitmap?,
+        PhotoUrl: String?
     ) {
         this.ID = id
         this.Name = name
@@ -33,6 +35,7 @@ class Person {
         this.Password = password
         this.Birthday = birthday
         this.Photo = photo
+        this.PhotoUrl = PhotoUrl
     }
 
     fun FullName() = "$Name $LastName"

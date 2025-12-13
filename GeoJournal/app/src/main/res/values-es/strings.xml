@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">GeoJournal</string>
     <string name="action_settings">Configuración</string>
+    <string name="save_history">Guardar</string>
     <string name="nextDialog">Siguiente</string>
     <string name="TextYes">Sí</string>
     <string name="TextNo">No</string>
@@ -27,4 +28,19 @@
     <string name="nameTxt_hint">Ingresa tu nombre</string>
     <string name="lnameTxt_hint">Ingresa tus apellidos</string>
     <string name="passTxt_hint">Ingresa tu contraseña</string>
+    <string name="preview_image">Añadir preview</string>
+    <string name="upload_media">añadir foto</string>
+    <string name="tap_to_add_photo">presionar para añadir foto</string>
+    <string name="you_can_use_camera_or_gallery">camara o galeria</string>
+    <string name="clear_image">eliminar foto</string>
+    <string name="new_memory">nueva memoria</string>
+    <string name="title">Titulo</string>
+    <string name="description">Descripción</string>
+    <string name="menu">Menú</string>
+    <string name="profile">Perfil</string>
+    <string name="see_history">Ver tus historias</string>
+    <string name="log_out">Cerrar sesión</string>
+    <string name="cd_open_menu">Abrir menú</string>
+    <string name="permits">Necesita aceptar los permisos de localzación</string>
+    <string name="sign_in">Iniciar Sesión</string>
 </resources>

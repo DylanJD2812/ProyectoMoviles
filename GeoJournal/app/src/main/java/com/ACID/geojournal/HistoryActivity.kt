@@ -14,12 +14,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import Util.Util
+import android.view.View
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import java.time.LocalDateTime
 
 class HistoryActivity : AppCompatActivity() {
-    private lateinit var btnUpload: Button
+    private lateinit var btnUpload: LinearLayout
     private lateinit var btnSave: Button
-    private lateinit var btnClear: Button
+    private lateinit var btnClear: ImageButton
+    private lateinit var previewScrim: View
     private lateinit var tile: EditText
     private lateinit var comment: EditText
     private lateinit var photo: ImageView
@@ -50,9 +54,10 @@ class HistoryActivity : AppCompatActivity() {
         btnUpload = findViewById(R.id.btnUpload_history)
         btnSave = findViewById(R.id.btnSave_history)
         btnClear = findViewById(R.id.btnClear_history)
-        tile = findViewById(R.id.TitleTxt_history)
-        comment = findViewById(R.id.CommentTxt_history)
-        photo = findViewById(R.id.PreviewPhoto_history)
+        previewScrim = findViewById(R.id.previewScrim)
+        tile = findViewById(R.id.etTitle_history)
+        comment = findViewById(R.id.etDescription_history)
+        photo = findViewById(R.id.imgPreview_history)
     }
 
     private fun setupPhotoLaunchers() {
@@ -62,6 +67,9 @@ class HistoryActivity : AppCompatActivity() {
             onPhotoCaptured = { bitmap ->
                 selectedBitmap = bitmap
                 photo.setImageBitmap(bitmap)
+                btnClear.visibility = View.VISIBLE
+                btnUpload.visibility = View.GONE
+                previewScrim.visibility = View.GONE
                 Util.showShortToast(this,"Photo captured successfully")
             },
             onCancel = {
@@ -75,6 +83,9 @@ class HistoryActivity : AppCompatActivity() {
             onPhotoSelected = { bitmap ->
                 selectedBitmap = bitmap
                 photo.setImageBitmap(bitmap)
+                btnClear.visibility = View.VISIBLE
+                btnUpload.visibility = View.GONE
+                previewScrim.visibility = View.GONE
                 Util.showShortToast(this,"Photo selected successfully")
             },
             onError = { errorMessage ->
@@ -111,6 +122,9 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     private fun cleanImage() {
+        btnClear.visibility = View.GONE
+        btnUpload.visibility = View.VISIBLE
+        previewScrim.visibility = View.VISIBLE
         photo.setImageResource(android.R.color.transparent)
         selectedBitmap = null
         Util.showShortToast(this,"Photo cleared")
@@ -127,8 +141,8 @@ class HistoryActivity : AppCompatActivity() {
         return true
     }
     private fun saveHistory() {
-        val personId = intent.getStringExtra("PERSON_ID") ?: run {
-            Util.showShortToast(this,"Error: User not identified")
+        val personId = Util.personID ?: run {
+            Util.showShortToast(this, getString(R.string.MsgDataNotFound))
             return
         }
         lifecycleScope.launch {

@@ -71,8 +71,7 @@ object PersonGateway : PDataManager {
                     if (birthdayStr.isNotEmpty()) {
                         Birthday = java.time.LocalDate.parse(birthdayStr)
                     }
-                    // Note: Photo is not loaded here for performance
-                    // You can load it separately if needed
+                    PhotoUrl = document.getString("PhotoUrl")?:""
                 }
             } else {
                 null

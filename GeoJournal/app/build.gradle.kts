@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.ACID.geojournal"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.ACID.geojournal"
@@ -82,6 +82,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.compose.animation.graphics)
 
 
     // Testing
@@ -92,5 +94,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-maps:19.2.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("io.coil-kt:coil:2.6.0")
 }

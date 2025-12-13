@@ -21,6 +21,7 @@ import java.util.Locale
 const val EXTRA_PERSON_ID="com.example.appw4.PersonID"
 class Util {
     companion object{
+        var personID: String? = null
         fun openActivity(context: Context,
                          objClass: Class<*>,
                          key: String="",
@@ -41,11 +42,14 @@ class Util {
             else
                 context.startActivity(intent)
         }
-        fun openActivityAndFinish(context: Context,
-                                  targetActivityClass: Class<*>) {
-            val intent = Intent(context, targetActivityClass)
+        fun openActivityAndFinish(context: Context, targetActivityClass: Class<*>) {
+            val intent = Intent(context, targetActivityClass).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
             context.startActivity(intent)
-            (context as? android.app.Activity)?.finish()
+            (context as? Activity)?.finish()
         }
 
         fun parseStringToDateModern(dateString: String, pattern: String): LocalDate? {

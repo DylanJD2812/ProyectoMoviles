@@ -1,6 +1,9 @@
 package com.ACID.geojournal
 
 import Controller.PersonController
+import Util.Util
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.view.View
@@ -11,15 +14,24 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
 class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 0
+    }
     private lateinit var Addbtn: Button
     private lateinit var Historybtn: Button
     private lateinit var Userbtn: Button
@@ -29,6 +41,7 @@ class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var drop: LinearLayout
     private lateinit var personController: PersonController
     private lateinit var map: GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +58,7 @@ class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
         initializeViews()
         setupClickListeners()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
     fun initializeViews() {
         Addbtn = findViewById<Button>(R.id.btnAddHistory)
@@ -62,11 +76,10 @@ class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
                     val currentUser = personController.getCurrentUser()
 
                     if (currentUser?.ID != null) {
-                        Util.Util.openActivity(
+                        Util.personID = currentUser.ID
+                        Util.openActivity(
                             this@HomeScreenActivity,
-                            HistoryActivity::class.java,
-                            "PERSON_ID",
-                            currentUser.ID
+                            HistoryActivity::class.java
                         )
                     } else {
                         showToast("Error: User not identified")
@@ -77,10 +90,10 @@ class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         Historybtn.setOnClickListener {
-            Util.Util.openActivity(this, HistoryListActivity::class.java)
+            Util.openActivity(this, HistoryListActivity::class.java)
         }
         Userbtn.setOnClickListener {
-            Util.Util.openActivity(this, UserActivity::class.java)
+            Util.openActivity(this, UserActivity::class.java)
         }
         Logoutbtn.setOnClickListener {
             showLogoutConfirmationDialog()
@@ -149,7 +162,7 @@ class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (success) {
                     showToast("Logged out successfully")
                     // Navigate to login screen
-                    Util.Util.openActivityAndFinish(this@HomeScreenActivity, LoginActivity::class.java)
+                    Util.openActivityAndFinish(this@HomeScreenActivity, LoginActivity::class.java)
                 } else {
                     showToast("Logout failed. Please try again.")
                 }
@@ -165,5 +178,58 @@ class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(p0: GoogleMap) {
         map = p0
+        locationEnable()
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                location?.let {
+                    val myLocation = LatLng(it.latitude, it.longitude)
+
+                    map.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            myLocation,
+                            16f // zoom recomendado
+                        )
+                    )
+                }
+            }
     }
+    private fun locationAllowed()=ContextCompat.
+    checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+    private fun locationEnable() {
+        if (!::map.isInitialized) return
+        if (locationAllowed()) {
+            map.isMyLocationEnabled = true
+        } else {
+            requestLocation()
+        }
+    }
+    private fun requestLocation() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            Util.showShortToast(this, getString(R.string.permits))
+        }else {
+            ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LOCATION_PERMISSION_REQUEST_CODE -> if (grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+                map.isMyLocationEnabled = true
+            }else{
+                Util.showShortToast(this, getString(R.string.permits))
+            }
+            else ->{}
+        }
+    }
+
 }
