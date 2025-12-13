@@ -7,6 +7,7 @@ class History {
     private var _id: String = ""
     private var _title: String = ""
     private var _comment: String = ""
+    private var _location: String = ""
     private var _photo: Bitmap? = null
     private var _createdAt: LocalDateTime = LocalDateTime.now()
     private var _personId: String = "" // Reference to the person who owns this history
@@ -14,10 +15,11 @@ class History {
     constructor()
 
     // Primary constructor
-    constructor(id: String, title: String, comment: String, photo: Bitmap?, personId: String, createdAt: LocalDateTime = LocalDateTime.now()) {
+    constructor(id: String, title: String, comment: String, location: String, photo: Bitmap?, personId: String, createdAt: LocalDateTime = LocalDateTime.now()) {
         this._id = id
         this._title = title
         this._comment = comment
+        this._location = location
         this._photo = photo
         this._personId = personId
         this._createdAt = createdAt
@@ -37,6 +39,11 @@ class History {
     var Comment: String
         get() = this._comment
         set(value) { this._comment = value }
+
+    // Getter / Setter for location
+    var Location: String
+        get() = this._location
+        set(value) { this._location = value }
 
     // Getter / Setter for photo
     var Photo: Bitmap?

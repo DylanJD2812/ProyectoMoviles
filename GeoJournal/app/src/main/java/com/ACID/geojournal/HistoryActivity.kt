@@ -2,22 +2,29 @@ package com.ACID.geojournal
 
 import Controller.HistoryController
 import Entity.History
+import Util.Util
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import Util.Util
-import android.view.View
-import android.widget.ImageButton
-import android.widget.LinearLayout
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import java.time.LocalDateTime
+import kotlinx.coroutines.launch
 
 class HistoryActivity : AppCompatActivity() {
     private lateinit var btnUpload: LinearLayout
@@ -27,6 +34,9 @@ class HistoryActivity : AppCompatActivity() {
     private lateinit var tile: EditText
     private lateinit var comment: EditText
     private lateinit var photo: ImageView
+    private lateinit var locationText: TextView
+    private var currentLocation: String? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var selectedBitmap: Bitmap? = null
 
     private lateinit var historyController: HistoryController
@@ -45,9 +55,11 @@ class HistoryActivity : AppCompatActivity() {
             insets
         }
         historyController = HistoryController(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         initializeViews()
         setupPhotoLaunchers()
         setupClickListeners()
+        requestLocation()
     }
 
     private fun initializeViews() {
@@ -58,6 +70,8 @@ class HistoryActivity : AppCompatActivity() {
         tile = findViewById(R.id.etTitle_history)
         comment = findViewById(R.id.etDescription_history)
         photo = findViewById(R.id.imgPreview_history)
+        locationText = findViewById(R.id.tvLocation_history)
+        updateLocationText(getString(R.string.location_pending))
     }
 
     private fun setupPhotoLaunchers() {
@@ -70,10 +84,10 @@ class HistoryActivity : AppCompatActivity() {
                 btnClear.visibility = View.VISIBLE
                 btnUpload.visibility = View.GONE
                 previewScrim.visibility = View.GONE
-                Util.showShortToast(this,"Photo captured successfully")
+                Util.showShortToast(this, "Photo captured successfully")
             },
             onCancel = {
-                Util.showShortToast(this,"Photo capture cancelled")
+                Util.showShortToast(this, "Photo capture cancelled")
             }
         )
 
@@ -86,13 +100,13 @@ class HistoryActivity : AppCompatActivity() {
                 btnClear.visibility = View.VISIBLE
                 btnUpload.visibility = View.GONE
                 previewScrim.visibility = View.GONE
-                Util.showShortToast(this,"Photo selected successfully")
+                Util.showShortToast(this, "Photo selected successfully")
             },
             onError = { errorMessage ->
-                Util.showShortToast(this,errorMessage)
+                Util.showShortToast(this, errorMessage)
             },
             onCancel = {
-                Util.showShortToast(this,"Photo selection cancelled")
+                Util.showShortToast(this, "Photo selection cancelled")
             }
         )
     }
@@ -107,6 +121,10 @@ class HistoryActivity : AppCompatActivity() {
         btnClear.setOnClickListener {
             cleanImage()
         }
+    }
+
+    private fun updateLocationText(value: String) {
+        locationText.text = value
     }
 
     private fun showPhotoSelectionDialog() {
@@ -127,8 +145,9 @@ class HistoryActivity : AppCompatActivity() {
         previewScrim.visibility = View.VISIBLE
         photo.setImageResource(android.R.color.transparent)
         selectedBitmap = null
-        Util.showShortToast(this,"Photo cleared")
+        Util.showShortToast(this, "Photo cleared")
     }
+
     private fun validateHistoryInput(): Boolean {
         if (tile.text.trim().isEmpty()) {
             Util.showShortToast(this, "Please enter a title")
@@ -140,6 +159,47 @@ class HistoryActivity : AppCompatActivity() {
         }
         return true
     }
+
+    private fun requestLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fetchLocation()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    private fun fetchLocation() {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    currentLocation = "${location.latitude}, ${location.longitude}"
+                    updateLocationText(currentLocation!!)
+                } else {
+                    updateLocationText(getString(R.string.location_unknown))
+                }
+            }
+            .addOnFailureListener {
+                updateLocationText(getString(R.string.location_unknown))
+            }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            fetchLocation()
+        } else {
+            updateLocationText(getString(R.string.location_unknown))
+        }
+    }
+
     private fun saveHistory() {
         val personId = Util.personID ?: run {
             Util.showShortToast(this, getString(R.string.MsgDataNotFound))
@@ -153,17 +213,18 @@ class HistoryActivity : AppCompatActivity() {
                 val history = History().apply {
                     Title = tile.text.toString().trim()
                     Comment = comment.text.toString().trim()
+                    Location = currentLocation ?: getString(R.string.location_unknown)
                     Photo = selectedBitmap
                     CreatedAt = LocalDateTime.now()
                     PersonId = personId
                 }
 
                 val historyId = historyController.addHistory(personId, history)
-                Util.showShortToast(this@HistoryActivity,"History saved successfully!")
+                Util.showShortToast(this@HistoryActivity, "History saved successfully!")
                 clearForm()
 
             } catch (e: Exception) {
-                Util.showShortToast(this@HistoryActivity,"Error saving history: ${e.message}")
+                Util.showShortToast(this@HistoryActivity, "Error saving history: ${e.message}")
             }
         }
     }
@@ -174,4 +235,7 @@ class HistoryActivity : AppCompatActivity() {
         cleanImage()
     }
 
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 2001
+    }
 }
