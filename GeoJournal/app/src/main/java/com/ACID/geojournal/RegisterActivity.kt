@@ -1,42 +1,49 @@
+
 package com.ACID.geojournal
 
 import Controller.PersonController
 import Entity.Person
+import Util.Util
 import android.app.DatePickerDialog
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.widget.Button
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Calendar
 
 class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
-    private lateinit var txtId: EditText
     private lateinit var txtName: EditText
-    private lateinit var txtFLastName: EditText
-    private lateinit var txtSLastName: EditText
+    private lateinit var txtLastName: EditText
     private lateinit var txtPhone: EditText
     private lateinit var txtEmail: EditText
+    private lateinit var txtPassword: EditText
     private lateinit var lbBirthdate: TextView
+    private lateinit var btnSignUp: Button
+    private lateinit var btnCancel: ImageButton
+    private lateinit var btnSelectDate: ImageButton
+    private lateinit var btnSelectPhoto: ImageButton // Single button for photo selection
 
-    private  var day :Int=0
-    private  var month: Int=0
-    private  var year: Int =0
+    private var day: Int = 0
+    private var month: Int = 0
+    private var year: Int = 0
 
-    private var isEditMode: Boolean = false
     private lateinit var personController: PersonController
 
-    private lateinit var menuItemDelete: MenuItem
+    private lateinit var cameraLauncher: Any
+    private lateinit var galleryLauncher: Any
+    private lateinit var userPhoto: ImageView
+    private var selectedBitmap: Bitmap? = null // Store the selected bitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,189 +55,229 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
             insets
         }
         personController = PersonController(this)
+        initializeViews()
+        setupPhotoLaunchers()
+        setupClickListeners()
+        ResetDate()
+    }
 
-        txtId= findViewById<EditText>(R.id.idText)
-        txtName=findViewById<EditText>(R.id.nameText)
-        txtFLastName=findViewById<EditText>(R.id.fnameText)
-        txtSLastName=findViewById<EditText>(R.id.snameText)
-        txtPhone=findViewById<EditText>(R.id.phoneText)
-        txtEmail=findViewById<EditText>(R.id.emailText)
-        lbBirthdate=findViewById<TextView>(R.id.lbBirthdate_Person)
+    private fun initializeViews() {
+        txtName = findViewById<EditText>(R.id.nameText)
+        txtLastName = findViewById<EditText>(R.id.lnameText)
+        txtPhone = findViewById<EditText>(R.id.phoneText)
+        txtEmail = findViewById<EditText>(R.id.emailText)
+        txtPassword = findViewById<EditText>(R.id.passText)
+        lbBirthdate = findViewById<TextView>(R.id.lbBirthdate_Person)
+        userPhoto = findViewById<ImageView>(R.id.photoPreview)
+        btnSignUp = findViewById<Button>(R.id.btnSignUp)
+        btnCancel = findViewById<ImageButton>(R.id.btnCancel)
+        btnSelectDate = findViewById<ImageButton>(R.id.btnSelectDate_person)
+        btnSelectPhoto =
+            findViewById<ImageButton>(R.id.ivCamera) // Rename this button in your layout to be more generic
+    }
 
-        ResetDate ()
 
-        val btnSelectDate = findViewById<ImageButton>(R.id.btnSelectDate_person)
-        btnSelectDate.setOnClickListener(View.OnClickListener{ view ->
+    private fun setupClickListeners() {
+        btnSignUp.setOnClickListener {
+            registerPerson()
+        }
+
+        btnCancel.setOnClickListener {
+            cleanScreen()
+        }
+
+        btnSelectPhoto.setOnClickListener {
+            showPhotoSelectionDialog()
+        }
+
+        btnSelectDate.setOnClickListener {
             showDatePickerDialog()
-        })
-        
-        val btnSearch = findViewById<ImageButton>(R.id.btnSearchId_person)
-        btnSearch.setOnClickListener(View.OnClickListener{view ->
-            searchPerson(txtId.text.trim().toString())
-        })
-
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.mnu_crud, menu)
-        menuItemDelete= menu!!.findItem(R.id.mnu_delete)
-        menuItemDelete.isVisible = isEditMode
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId){
-            R.id.mnu_save ->{
-                if (isEditMode){
-                    Util.Util.showDialogCondition(this
-                        , getString(R.string.TextSaveActionQuestion)
-                        , { savePerson() })
-                }else{
-                    savePerson()
-                }
-                return true
-            }
-            R.id.mnu_delete ->{
-                Util.Util.showDialogCondition(this
-                    , getString(R.string.TextDeleteActionQuestion)
-                    , { deletePerson() })
-                return true
-            }
-            R.id.mnu_cancel ->{
-                cleanScreen()
-                return true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun ResetDate (){
+    private fun setupPhotoLaunchers() {
+        // Initialize camera launcher
+        cameraLauncher = Util.createCameraLauncher(
+            activity = this,
+            onPhotoCaptured = { bitmap ->
+                selectedBitmap = bitmap
+                userPhoto.setImageBitmap(bitmap)
+                Util.showShortToast(this, "Photo captured successfully")
+            },
+            onCancel = {
+                Util.showShortToast(this, "Photo capture cancelled")
+            }
+        )
+
+        // Initialize gallery launcher
+        galleryLauncher = Util.createGalleryLauncher(
+            activity = this,
+            onPhotoSelected = { bitmap ->
+                selectedBitmap = bitmap
+                userPhoto.setImageBitmap(bitmap)
+                Util.showShortToast(this, "Photo selected successfully")
+            },
+            onError = { errorMessage ->
+                Util.showShortToast(this, errorMessage)
+            },
+            onCancel = {
+                Util.showShortToast(this, "Photo selection cancelled")
+            }
+        )
+    }
+
+    private fun showPhotoSelectionDialog() {
+        Util.showPhotoSelectionDialog(
+            context = this,
+            onTakePhoto = {
+                Util.takePhoto(cameraLauncher)
+            },
+            onSelectFromGallery = {
+                Util.selectPhoto(galleryLauncher)
+            }
+        )
+    }
+
+    private fun ResetDate() {
         val calendar = Calendar.getInstance()
         year = calendar.get(Calendar.YEAR)
         day = calendar.get(Calendar.DAY_OF_MONTH)
         month = calendar.get(Calendar.MONTH)
-
     }
 
-    private fun showDatePickerDialog(){
-        val datePickerDialog = DatePickerDialog(this, this
-            , year, month, day)
+    private fun showDatePickerDialog() {
+        val datePickerDialog = DatePickerDialog(this, this, year, month, day)
         datePickerDialog.show()
     }
 
-    private fun getDateFormatString(dayOfMonth: Int, monthValue: Int, yearValue: Int): String{
+    private fun getDateFormatString(dayOfMonth: Int, monthValue: Int, yearValue: Int): String {
         return "${if (dayOfMonth < 10) "0" else ""}$dayOfMonth/${if (monthValue < 10) "0" else ""}$monthValue/$yearValue"
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        lbBirthdate.text=getDateFormatString(dayOfMonth, month+1, year)
+        this.year = year
+        this.month = month
+        this.day = dayOfMonth
+        lbBirthdate.text = getDateFormatString(dayOfMonth, month + 1, year)
     }
 
-    private fun searchPerson(id: String){
-        try {
-            val person = personController.GetById(id)
-            if (person != null){
-                isEditMode=true
-                txtId.setText(person.ID.toString())
-                txtId.isEnabled=false
-                txtName.setText(person.Name)
-                txtFLastName.setText(person.FLastName)
-                txtSLastName.setText(person.SLastName)
-                txtEmail.setText(person.Email)
-                txtPhone.setText(person.Phone.toString())
-                lbBirthdate.setText(getDateFormatString(person.Birthday.dayOfMonth
-                    , person.Birthday.month.value, person.Birthday.year ))
-                year = person.Birthday.year
-                month = person.Birthday.month.value - 1
-                day = person.Birthday.dayOfMonth
-                menuItemDelete.isVisible = true
-            }else{
-                Toast.makeText(this, getString(R.string.MsgDataNotFound),
-                    Toast.LENGTH_LONG).show()
-            }
-        }catch (e: Exception){
-            cleanScreen()
-            Toast.makeText(this, e.message.toString(),
-                Toast.LENGTH_LONG).show()
+    private fun isValidationData(): Boolean {
+        if (lbBirthdate.text.isNullOrEmpty()) {
+            Util.showShortToast(this, "Please select birth date")
+            return false
         }
+
+        val dateParse = Util.parseStringToDateModern(lbBirthdate.text.toString(), "dd/MM/yyyy")
+
+        if (txtName.text.trim().isEmpty()) {
+            Util.showShortToast(this, "Please enter name")
+            return false
+        }
+
+        if (txtLastName.text.trim().isEmpty()) {
+            Util.showShortToast(this, "Please enter last name")
+            return false
+        }
+
+        if (txtEmail.text.trim().isEmpty()) {
+            Util.showShortToast(this, "Please enter email")
+            return false
+        }
+
+        if (txtPassword.text.trim().isEmpty() || txtPassword.text.length < 6) {
+            Util.showShortToast(this, "Password must be at least 6 characters")
+            return false
+        }
+
+        val phoneText = txtPhone.text.trim()
+        if (phoneText.isEmpty() || phoneText.length < 8 || phoneText.toString()
+                .toIntOrNull() == null
+        ) {
+            Util.showShortToast(this, "Please enter a valid phone number (at least 8 digits)")
+            return false
+        }
+
+        if (dateParse == null) {
+            Util.showShortToast(this, "Invalid date format")
+            return false
+        }
+
+        return true
     }
 
-    fun isValidationData(): Boolean{
-        val dateparse = Util.Util.parseStringToDateModern(lbBirthdate.text.toString(), "dd/MM/yyyy")
-        return txtId.text.trim().isNotEmpty() && txtName.text.trim().isNotEmpty()
-                && txtFLastName.text.trim().isNotEmpty() && txtSLastName.text.trim().isNotEmpty()
-                && txtEmail.text.trim().isNotEmpty() && lbBirthdate.text.trim().isNotEmpty()
-                && (txtPhone.text.trim().isNotEmpty() && txtPhone.text.trim().length >= 8
-                && txtPhone.text.toString()?.toInt()!! != null && txtPhone.text.toString()?.toInt()!! != 0)
-                && dateparse != null
-
-
-    }
-
-    private fun cleanScreen(){
+    private fun cleanScreen() {
         ResetDate()
-        isEditMode=false
-        txtId.isEnabled = true
-        txtId.setText("")
         txtName.setText("")
-        txtFLastName.setText("")
-        txtSLastName.setText("")
+        txtLastName.setText("")
         txtEmail.setText("")
         txtPhone.setText("")
-        lbBirthdate.setText("")
-        invalidateOptionsMenu()
+        txtPassword.setText("")
+        lbBirthdate.text = ""
+        userPhoto.setImageResource(android.R.color.transparent) // Clear photo
+        selectedBitmap = null // Clear stored bitmap
     }
 
-    fun savePerson(){
-        try {
-            if (isValidationData()){
-                if (personController.GetById(txtId.text.toString().trim()) != null
-                    && !isEditMode){
-                    Toast.makeText(this, getString(R.string.MsgDuplicateDate)
-                        , Toast.LENGTH_LONG).show()
-                }else{
-                    val person = Person()
-                    person.ID = txtId.text.toString()
-                    person.Name = txtName.text.toString()
-                    person.FLastName = txtFLastName.text.toString()
-                    person.SLastName = txtSLastName.text.toString()
-                    person.Email = txtEmail.text.toString()
-                    person.Phone = txtPhone.text.toString().toInt()
-                    person.Photo = null
-                    val bDateParse = Util.Util.parseStringToDateModern(lbBirthdate.text.toString(),
-                        "dd/MM/yyyy")
-                    person.Birthday = LocalDate.of(bDateParse?.year!!, bDateParse.month.value
-                        , bDateParse?.dayOfMonth!!)
-                    if (!isEditMode)
-                        personController.addPerson(person)
-                    else
-                        personController.updatePerson(person)
-
-                    cleanScreen()
-
-                    Toast.makeText(this, getString(R.string.MsgSaveSuccess)
-                        , Toast.LENGTH_LONG).show()
+    private fun registerPerson() {
+        lifecycleScope.launch {
+            try {
+                if (!isValidationData()) {
+                    return@launch
                 }
-            }else{
-                Toast.makeText(this, "Datos incompletos"
-                    , Toast.LENGTH_LONG).show()
+
+                val bDateParse =
+                    Util.parseStringToDateModern(lbBirthdate.text.toString(), "dd/MM/yyyy")
+                        ?: run {
+                            Util.showShortToast(this@RegisterActivity, "Invalid date format")
+                            return@launch
+                        }
+
+                // Store credentials for login attempt
+                val email = txtEmail.text.toString().trim()
+                val password = txtPassword.text.toString().trim()
+
+                val person = Person().apply {
+                    Name = txtName.text.toString().trim()
+                    LastName = txtLastName.text.toString().trim()
+                    Phone = txtPhone.text.toString().toIntOrNull() ?: 0
+                    Email = email
+                    Password = password
+                    Birthday =
+                        LocalDate.of(bDateParse.year, bDateParse.monthValue, bDateParse.dayOfMonth)
+                    Photo = selectedBitmap
+                }
+
+                // Register the person
+                val newId = personController.addPerson(person)
+                Util.showShortToast(this@RegisterActivity, getString(R.string.MsgSaveSuccess))
+
+                // Attempt to login with the same credentials
+                val loginSuccess = personController.login(email, password)
+
+                if (loginSuccess) {
+                    Util.showShortToast(
+                        this@RegisterActivity,
+                        "Registration successful! Auto-login completed."
+                    )
+                    // Navigate to main activity or home screen
+                    Util.openActivityAndFinish(
+                        this@RegisterActivity,
+                        HomeScreenActivity::class.java
+                    )
+                } else {
+                    Util.showShortToast(
+                        this@RegisterActivity,
+                        "Registration successful! Please login manually."
+                    )
+                    cleanScreen()
+                    // Optionally navigate to login screen
+                    Util.openActivity(this@RegisterActivity, LoginActivity::class.java)
+                }
+
+            } catch (e: Exception) {
+                Util.showShortToast(this@RegisterActivity, e.message ?: "Registration failed")
             }
-        }catch (e: Exception){
-            Toast.makeText(this, e.message.toString()
-                , Toast.LENGTH_LONG).show()
         }
     }
 
-    fun deletePerson(): Unit{
-        try {
-            personController.removePerson(txtId.text.toString())
-            cleanScreen()
-            Toast.makeText(this, getString(R.string.MsgDeleteSuccess)
-                , Toast.LENGTH_LONG).show()
-        }catch (e: Exception){
-            Toast.makeText(this, e.message.toString()
-                , Toast.LENGTH_LONG).show()
-        }
-    }
+
 }

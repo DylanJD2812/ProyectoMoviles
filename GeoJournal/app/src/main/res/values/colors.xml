@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- LIGHT -->
+    <color name="primary">#2E7D32</color>
+    <color name="onPrimary">#FFFFFF</color>
+
+    <color name="surface_light">#FFFFFF</color>
+    <color name="surfaceContainer_light">#F5F6F5</color>
+    <color name="onSurface_light">#1A1C1A</color>
+    <color name="onSurfaceVariant_light">#444844</color>
+
+    <color name="outline_light">#D0D5D1</color>
+
+    <!-- DARK -->
+    <color name="primary_dark">#77D980</color>
+    <color name="onPrimary_dark">#0B1F0C</color>
+
+    <color name="surface_dark">#0F1410</color>
+    <color name="surfaceContainer_dark">#151B16</color>
+    <color name="onSurface_dark">#E6EAE5</color>
+    <color name="onSurfaceVariant_dark">#B6BDB7</color>
+
+    <color name="outline_dark">#2B342D</color>
 </resources>

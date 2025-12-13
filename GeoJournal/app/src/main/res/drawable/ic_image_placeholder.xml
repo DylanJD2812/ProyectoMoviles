@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M12,2
+                          A10,10 0 1,1 11.999,2 Z"/>
+
+    <!-- Image icon -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M21,19V5c0,-1.1 -0.9,-2 -2,-2H5
+                          c-1.1,0 -2,0.9 -2,2v14
+                          c0,1.1 0.9,2 2,2h14
+                          c1.1,0 2,-0.9 2,-2z
+                          M8.5,13.5l2.5,3.01L14.5,12l4.5,6H5
+                          l3.5,-4.5z"/>
+</vector>

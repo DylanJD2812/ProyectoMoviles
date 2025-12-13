@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Blue circle -->
+    <path
+        android:fillColor="#AEE1F9"
+        android:pathData="M32,64A32,32 0 1,0 32,0a32,32 0 1,0 0,64z" />
+
+    <!-- Upload arrow -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,38h4V22l6,6 2.5,-2.5L32,16l-10.5,9.5L24,28l6,-6v16zM22,44h20v4H22z" />
+</vector>
