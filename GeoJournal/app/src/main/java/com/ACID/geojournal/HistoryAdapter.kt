@@ -1,11 +1,12 @@
 package com.ACID.geojournal
 
 import Entity.History
+import Interface.OnItemClickListener
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class HistoryAdapter : RecyclerView.Adapter<HViewHolder>() {
+class HistoryAdapter(val clickListener: OnItemClickListener) : RecyclerView.Adapter<HViewHolder>() {
 
     private val historyList = mutableListOf<History>()
 
@@ -23,7 +24,7 @@ class HistoryAdapter : RecyclerView.Adapter<HViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: HViewHolder, position: Int) {
-        holder.render(historyList[position])
+        holder.render(historyList[position],clickListener)
     }
 
     override fun getItemCount(): Int = historyList.size

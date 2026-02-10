@@ -19,7 +19,8 @@
     <string name="profile">Profile</string>
     <string name="see_history">See histories</string>
     <string name="log_out">Log out</string>
-    <string name="cd_open_menu">Open menu</string>    <string name="save_history">Save</string>
+    <string name="cd_open_menu">Open menu</string>
+    <string name="save_history">Save</string>
     <string name="nextDialog">Next</string>
     <string name="TextYes">Yes</string>
     <string name="TextNo">No</string>
@@ -51,5 +52,7 @@
     <string name="password">Password</string>
     <string name="login">LOGIN</string>
     <string name="forgot_password">Forgot your password?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

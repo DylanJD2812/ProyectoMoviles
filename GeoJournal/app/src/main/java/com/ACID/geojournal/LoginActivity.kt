@@ -61,6 +61,7 @@ class LoginActivity : AppCompatActivity() {
             val success = personController.login(email, password)
             if (success) {
                 Util.Util.showShortToast(this@LoginActivity, "Login successful")
+                Util.Util.personID = personController.getCurrentUser()?.ID
                 Util.Util.openActivityAndFinish(
                     this@LoginActivity,
                     HomeScreenActivity::class.java

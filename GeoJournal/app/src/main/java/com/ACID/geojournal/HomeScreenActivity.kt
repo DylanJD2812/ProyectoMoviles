@@ -76,7 +76,6 @@ class HomeScreenActivity : AppCompatActivity(), OnMapReadyCallback {
                     val currentUser = personController.getCurrentUser()
 
                     if (currentUser?.ID != null) {
-                        Util.personID = currentUser.ID
                         Util.openActivity(
                             this@HomeScreenActivity,
                             HistoryActivity::class.java
